@@ -5,21 +5,20 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class ParticipateInForumTest extends TestCase
+class ParticipateInThreadsTest extends TestCase
 {
-
     use DatabaseMigrations;
 
     /** @test */
-    public function an_unauthenticated_user_may_not_add_replies()
+    function unauthenticated_users_may_not_add_replies()
     {
         $this->withExceptionHandling()
-            ->post('/threads/channel/1/replies', [])
+            ->post('/threads/some-channel/1/replies', [])
             ->assertRedirect('/login');
     }
 
     /** @test */
-    public function an_authenticated_user_may_participate_in_forum_threads()
+    function an_authenticated_user_may_participate_in_forum_threads()
     {
         $this->signIn();
 
@@ -33,19 +32,19 @@ class ParticipateInForumTest extends TestCase
     }
 
     /** @test */
-    function a_reply_requires_a_body() 
+    function a_reply_requires_a_body()
     {
-        $this->signIn();
+        $this->withExceptionHandling()->signIn();
 
         $thread = create('App\Thread');
-        $reply = make('App\Reply', [ 'body' => null ]);
+        $reply = make('App\Reply', ['body' => null]);
 
         $this->post($thread->path() . '/replies', $reply->toArray())
-            ->assertSessionHasErrors('body');
+             ->assertSessionHasErrors('body');
     }
 
     /** @test */
-    function unauthorize_users_cannot_delete_replies()
+    function unauthorized_users_cannot_delete_replies()
     {
         $this->withExceptionHandling();
 
@@ -60,15 +59,31 @@ class ParticipateInForumTest extends TestCase
     }
 
     /** @test */
-    function an_authorize_users_can_delete_replies()
+    function authorized_users_can_delete_replies()
     {
         $this->signIn();
-
         $reply = create('App\Reply', ['user_id' => auth()->id()]);
 
-        $this->delete("/replies/{$reply->id}");
+        $this->delete("/replies/{$reply->id}")->assertStatus(302);
+
         $this->assertDatabaseMissing('replies', ['id' => $reply->id]);
+
         $this->assertEquals(0, $reply->thread->fresh()->replies_count);
+    }
+
+    /** @test */
+    function unauthorized_users_cannot_update_replies()
+    {
+        $this->withExceptionHandling();
+
+        $reply = create('App\Reply');
+
+        $this->patch("/replies/{$reply->id}")
+            ->assertRedirect('login');
+
+        $this->signIn()
+            ->patch("/replies/{$reply->id}")
+            ->assertStatus(403);
     }
 
     /** @test */
@@ -78,31 +93,9 @@ class ParticipateInForumTest extends TestCase
 
         $reply = create('App\Reply', ['user_id' => auth()->id()]);
 
-        $body = 'You have been changed, fool';
+        $updatedReply = 'You been changed, fool.';
+        $this->patch("/replies/{$reply->id}", ['body' => $updatedReply]);
 
-        $this->patch("/replies/{$reply->id}", [
-            'body' => $body
-        ]);
-        $this->assertDatabaseHas('replies', [
-            'id' => $reply->id, 
-            'body' => $body
-        ]);
-    }
-
-    /** @test */
-    function unauthorize_users_cannot_update_replies()
-    {
-        $this->withExceptionHandling();
-
-        $reply = create('App\Reply');
-
-        $this->patch("/replies/{$reply->id}", [
-            'id' => $reply->id, 
-            'body' => 'You have been changed, fool'
-        ])->assertRedirect('login');
-
-        $this->signIn()
-            ->delete("/replies/{$reply->id}")
-            ->assertStatus(403);
+        $this->assertDatabaseHas('replies', ['id' => $reply->id, 'body' => $updatedReply]);
     }
 }

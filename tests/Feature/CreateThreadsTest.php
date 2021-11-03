@@ -11,7 +11,7 @@ class CreateThreadsTest extends TestCase
     use DatabaseMigrations;
 
     /** @test */
-    function guest_may_not_create_threads()
+    function guests_may_not_create_threads()
     {
         $this->withExceptionHandling();
 
@@ -28,6 +28,7 @@ class CreateThreadsTest extends TestCase
         $this->signIn();
 
         $thread = make('App\Thread');
+
         $response = $this->post('/threads', $thread->toArray());
 
         $this->get($response->headers->get('Location'))
@@ -38,14 +39,14 @@ class CreateThreadsTest extends TestCase
     /** @test */
     function a_thread_requires_a_title()
     {
-        $this->publishThread([ 'title' => null ])
+        $this->publishThread(['title' => null])
             ->assertSessionHasErrors('title');
     }
 
     /** @test */
     function a_thread_requires_a_body()
     {
-        $this->publishThread([ 'body' => null ])
+        $this->publishThread(['body' => null])
             ->assertSessionHasErrors('body');
     }
 
@@ -54,10 +55,10 @@ class CreateThreadsTest extends TestCase
     {
         factory('App\Channel', 2)->create();
 
-        $this->publishThread([ 'channel_id' => null ])
+        $this->publishThread(['channel_id' => null])
             ->assertSessionHasErrors('channel_id');
 
-        $this->publishThread([ 'channel_id' => 999 ])
+        $this->publishThread(['channel_id' => 999])
             ->assertSessionHasErrors('channel_id');
     }
 
@@ -89,22 +90,12 @@ class CreateThreadsTest extends TestCase
         $this->assertDatabaseMissing('threads', ['id' => $thread->id]);
         $this->assertDatabaseMissing('replies', ['id' => $reply->id]);
 
-        // $this->assertDatabaseMissing('activities', [
-        //     'subject_id' => $thread->id,
-        //     'subject_type' => get_class($thread)
-        // ]);
-
-        // $this->assertDatabaseMissing('activities', [
-        //     'subject_id' => $reply->id,
-        //     'subject_type' => get_class($reply)
-        // ]);
-
         $this->assertEquals(0, Activity::count());
     }
 
     protected function publishThread($overrides = [])
     {
-        $this->signIn();
+        $this->withExceptionHandling()->signIn();
 
         $thread = make('App\Thread', $overrides);
 
