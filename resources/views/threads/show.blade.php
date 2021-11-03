@@ -28,11 +28,11 @@
                         </div>
                     </div>
 
-                    <replies :data="{{ $thread->replies }}" @removed="repliesCount--"></replies>
+                    <replies :data="{{ $thread->replies }}" @removed="repliesCount--" @added="repliesCount++"></replies>
 
                     {{-- {{ $replies->links() }} --}}
 
-                    @if (auth()->check())
+                    {{-- @if (auth()->check())
                         <form method="POST" action="{{ $thread->path() }}/replies" class="w-100 mt-4">
                             {{ csrf_field() }} 
                             <div class="form-group">
@@ -45,7 +45,7 @@
                         <p class="text-center">
                             Please <a href="{{ route('login') }}">sign in</a> to participate in this discussion.
                         </p>
-                    @endif
+                    @endif --}}
 
                 </div>
                 <div class="col-md-4">
