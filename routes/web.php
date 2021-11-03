@@ -31,6 +31,7 @@ Route::post('/threads', 'ThreadController@store');
 // Route::put('/threads/{thread}', 'ThreadController@update');
 // Route::delete('/threads/{thread}', 'ThreadController@delete');
 
+Route::get('/threads/{channel}/{thread}/replies', 'ReplyController@index');
 Route::post('/threads/{channel}/{thread}/replies', 'ReplyController@store');
 
 Route::post('/replies/{reply}/favorites', 'FavoriteController@store');

@@ -122,6 +122,7 @@ namespace App{
  * @property int $id
  * @property int $user_id
  * @property int $channel_id
+ * @property-read int|null $replies_count
  * @property string $title
  * @property string $body
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -131,7 +132,6 @@ namespace App{
  * @property-read \App\Channel $channel
  * @property-read \App\User $creator
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Reply[] $replies
- * @property-read int|null $replies_count
  * @method static \Illuminate\Database\Eloquent\Builder|Thread filters($filters)
  * @method static \Illuminate\Database\Eloquent\Builder|Thread newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Thread newQuery()
@@ -140,6 +140,7 @@ namespace App{
  * @method static \Illuminate\Database\Eloquent\Builder|Thread whereChannelId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Thread whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Thread whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Thread whereRepliesCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Thread whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Thread whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Thread whereUserId($value)

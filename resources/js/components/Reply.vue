@@ -2,7 +2,7 @@
     <div :id="'reply-' + id" class="card">
         <div class="card-header d-flex align-items-center justify-content-between">
             <div>
-                <a :href="'/profiles/' + data.owner.name" v-text="data.owner.name"></a> said {{ data.owner.created_at }}...
+                <a :href="'/profiles/' + data.owner.name" v-text="data.owner.name"></a> said <span v-text="ago"></span>...
             </div>
             <div v-if="signedIn">
                 <favorite :reply="data"></favorite>
@@ -28,7 +28,8 @@
     </div>
 </template>
 <script>
-    import Favorite from './Favorite.vue'
+    import Favorite from './Favorite.vue';
+    import moment from 'moment';
     export default {
         components: { Favorite },
         props: ['data'],
@@ -40,6 +41,9 @@
             };
         },
         computed: { 
+            ago() {
+                return moment(this.data.owner.created_at).fromNow();
+            },
             signedIn() {
                 return window.app.signedIn;
             },
