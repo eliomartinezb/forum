@@ -131,7 +131,10 @@ namespace App{
  * @property-read int|null $activity_count
  * @property-read \App\Channel $channel
  * @property-read \App\User $creator
+ * @property-read mixed $is_subscribed_to
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Reply[] $replies
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\ThreadSubscription[] $subscriptions
+ * @property-read int|null $subscriptions_count
  * @method static \Illuminate\Database\Eloquent\Builder|Thread filters($filters)
  * @method static \Illuminate\Database\Eloquent\Builder|Thread newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Thread newQuery()
@@ -146,6 +149,27 @@ namespace App{
  * @method static \Illuminate\Database\Eloquent\Builder|Thread whereUserId($value)
  */
 	class Thread extends \Eloquent {}
+}
+
+namespace App{
+/**
+ * App\ThreadSubscription
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property int $thread_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|ThreadSubscription newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ThreadSubscription newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ThreadSubscription query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ThreadSubscription whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ThreadSubscription whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ThreadSubscription whereThreadId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ThreadSubscription whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ThreadSubscription whereUserId($value)
+ */
+	class ThreadSubscription extends \Eloquent {}
 }
 
 namespace App{
