@@ -41,6 +41,9 @@ Route::patch('/replies/{reply}', 'ReplyController@update');
 Route::delete('/replies/{reply}', 'ReplyController@destroy');
 
 Route::get('/profiles/{user}', 'ProfileController@show')->name('profile');
+Route::get('/profiles/{user}/notifications', 'UserNotificationsController@index');
+Route::delete('/profiles/{user}/notifications/{notificationId}', 'UserNotificationsController@destroy');
+
 
 Route::post('threads/{channel}/{thread}/subscriptions', 'ThreadSubscriptionController@store')->middleware('auth');
 Route::delete('threads/{channel}/{thread}/subscriptions', 'ThreadSubscriptionController@destroy')->middleware('auth');
