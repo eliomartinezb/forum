@@ -2,9 +2,11 @@
 
 namespace App;
 
-use App\Notifications\ThreadWasUpdated;
+use App\Events\ThreadHasNewReply;
 use App\Traits\RecordsActivity;
+use App\Notifications\ThreadWasUpdated;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 
 class Thread extends Model
 {
@@ -16,7 +18,7 @@ class Thread extends Model
 
     protected $appends = ['isSubscribedTo'];
 
-    public static function boot() 
+    public static function boot()
     {
         parent::boot();
 
@@ -28,12 +30,12 @@ class Thread extends Model
             $thread->replies->each->delete();
         });
     }
-    
+
     public function path()
     {
         return "/threads/{$this->channel->slug}/{$this->id}";
     }
-    
+
     public function replies()
     {
         return $this->hasMany('App\Reply');
@@ -48,11 +50,17 @@ class Thread extends Model
     {
         $reply = $this->replies()->create($reply);
 
-        $this->subscriptions->filter(function ($sub) use ($reply) {
-            return $reply->user_id != $sub->user_id;
-        })->each->notify($reply);
+        $this->notifySubscribers($reply);
 
         return $reply;
+    }
+
+    protected function notifySubscribers(Reply $reply)
+    {
+        $this->subscriptions
+            ->where('user_id', '!=', $reply->user_id)
+            ->each
+            ->notify($reply);
     }
 
     public function channel()
