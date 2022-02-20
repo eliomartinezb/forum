@@ -6,6 +6,7 @@ use App\Channel;
 use App\Filters\ThreadFilters;
 use App\Thread;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ThreadController extends Controller
@@ -17,7 +18,7 @@ class ThreadController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function index(Channel $channel, ThreadFilters $filters)
     {
@@ -33,7 +34,7 @@ class ThreadController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function create()
     {
@@ -68,10 +69,14 @@ class ThreadController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Thread  $thread
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function show($channelId, Thread $thread)
     {
+        if (auth()->check()) {
+            auth()->user()->readThread($thread);
+        }
+
         return view('threads.show', compact('thread'));
     }
 
@@ -112,7 +117,7 @@ class ThreadController extends Controller
 
         if (request()->wantsJson()) {
             return response([], 204);
-        }      
+        }
 
         return redirect('/threads');
     }

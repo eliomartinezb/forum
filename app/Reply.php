@@ -17,7 +17,7 @@ class Reply extends Model
 
     protected $appends = ['favoritesCount', 'isFavorited'];
 
-    public static function boot() 
+    public static function boot()
     {
         parent::boot();
 
@@ -30,17 +30,17 @@ class Reply extends Model
         });
     }
 
-    public function owner()
+    public function owner(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo('App\User', 'user_id');
     }
 
-    public function thread()
+    public function thread(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo('App\Thread');
     }
 
-    public function path()
+    public function path(): string
     {
         return $this->thread->path() . "#reply-{$this->id}";
     }

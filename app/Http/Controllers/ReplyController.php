@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Reply;
+use App\Spam;
 use App\Thread;
 use Illuminate\Http\Request;
 
@@ -39,8 +40,11 @@ class ReplyController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param $channelId
+     * @param Thread $thread
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws \Exception
      */
     public function store($channelId, Thread $thread)
     {
@@ -85,7 +89,7 @@ class ReplyController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @param  \App\Reply  $reply
      * @return \Illuminate\Http\Response
      */
@@ -94,7 +98,7 @@ class ReplyController extends Controller
         $this->authorize('update', $reply);
 
         $this->validate(request(), ['body' => 'required']);
-        
+
         $reply->update(request(['body']));
     }
 

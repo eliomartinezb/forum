@@ -46,8 +46,12 @@ class Thread extends Model
         return $this->belongsTo('App\User', 'user_id');
     }
 
+    /**
+     * @throws \Exception
+     */
     public function addReply($reply)
     {
+        (new Spam())->detect($reply-> body);
         $reply = $this->replies()->create($reply);
 
         $this->notifySubscribers($reply);
@@ -99,5 +103,14 @@ class Thread extends Model
         return $this->subscriptions()
             ->where('user_id', auth()->id())
             ->exists();
+    }
+
+    public function hasUpdatesFor(User $user = null): bool
+    {
+        $user = $user ?: auth()->user();
+
+        $key = $user->visitedThreadCacheKey($this);
+
+        return $this->updated_at >cache($key);
     }
 }
