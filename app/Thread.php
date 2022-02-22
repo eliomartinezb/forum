@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Events\ThreadHasNewReply;
 use App\Traits\RecordsActivity;
 use App\Notifications\ThreadWasUpdated;
 use Illuminate\Database\Eloquent\Model;
@@ -49,9 +48,9 @@ class Thread extends Model
     /**
      * @throws \Exception
      */
-    public function addReply($reply)
+    public function addReply($reply): Model
     {
-        (new Spam())->detect($reply-> body);
+        (new Spam())->detect($reply["body"]);
         $reply = $this->replies()->create($reply);
 
         $this->notifySubscribers($reply);

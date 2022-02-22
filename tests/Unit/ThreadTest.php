@@ -48,8 +48,10 @@ class ThreadTest extends TestCase
     /** @test */
     public function a_thread_can_add_a_reply()
     {
+        $reply = make('App\Reply');
+
         $this->thread->addReply([
-            'body' => 'Foobar',
+            'body' => $reply->body,
             'user_id' => 1
         ]);
 

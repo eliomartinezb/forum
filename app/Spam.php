@@ -23,10 +23,10 @@ class Spam
     private function detectInvalidKeywords($body)
     {
         $invalidKeywords = [
-            'Yahoo Customer Support'
+            strtolower('Yahoo Customer Support')
         ];
 
-        if (in_array($body, $invalidKeywords)) {
+        if (in_array(strtolower($body), $invalidKeywords)) {
             throw new Exception('Your reply contains spam');
         }
     }
