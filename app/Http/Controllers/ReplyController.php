@@ -42,11 +42,11 @@ class ReplyController extends Controller
      *
      * @param $channelId
      * @param Thread $thread
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Database\Eloquent\Model
      * @throws \Illuminate\Validation\ValidationException
      * @throws \Exception
      */
-    public function store($channelId, Thread $thread)
+    public function store($channelId, Thread $thread): \Illuminate\Database\Eloquent\Model
     {
         $this->validate(request(), [
             'body' => 'required'

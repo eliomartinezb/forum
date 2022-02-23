@@ -2,8 +2,6 @@
 
 namespace App;
 
-use Exception;
-
 class Spam
 {
 
@@ -18,7 +16,7 @@ class Spam
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function detectInvalidKeywords($body)
     {
@@ -27,7 +25,7 @@ class Spam
         ];
 
         if (in_array(strtolower($body), $invalidKeywords)) {
-            throw new Exception('Your reply contains spam');
+            throw new \Exception('Your reply contains spam');
         }
     }
 }
