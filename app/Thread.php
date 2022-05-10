@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Inspections\Spam;
 use App\Traits\RecordsActivity;
 use Illuminate\Database\Eloquent\Model;
 

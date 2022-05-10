@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Spam;
+use App\Inspections\Spam;
 use Exception;
 use PHPUnit\Framework\TestCase;
 
