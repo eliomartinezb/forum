@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Channel;
 use App\Filters\ThreadFilters;
-use App\Inspections\Spam;
 use App\Thread;
 use App\User;
 use Carbon\Carbon;
@@ -48,19 +47,16 @@ class ThreadController extends Controller
      * Store a newly created resource in storage.
      *
      * @param Request $request
-     * @param Spam $spam
      * @return Response
      * @throws ValidationException
      */
-    public function store(Request $request, Spam $spam)
+    public function store(Request $request)
     {
-        $this->validate($request, [
-            'title' => 'required',
-            'body' => 'required',
+        $request->validate([
+            'title' => 'required|spamFree',
+            'body' => 'required|spamFree',
             'channel_id' => 'required|exists:channels,id'
         ]);
-
-        $spam->detect($request->body);
 
         $thread = Thread::create([
             'user_id' => auth()->id(),

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Inspections\Spam;
 use App\Reply;
 use App\Thread;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -53,7 +52,7 @@ class ReplyController extends Controller
     public function store($channelId, Thread $thread): RedirectResponse
     {
         try{
-            $this->validateReply();
+            request()->validate(['body' => 'required|spamFree']);
 
             $reply = $thread->addReply([
                 'body' => request('body'),
@@ -100,12 +99,12 @@ class ReplyController extends Controller
      * @return void
      * @throws ValidationException|AuthorizationException
      */
-    public function update(Request $request, Reply $reply, Spam $spam)
+    public function update(Request $request, Reply $reply)
     {
         $this->authorize('update', $reply);
 
         try {
-            $this->validateReply();
+            request()->validate(['body' => 'required|spamFree']);
             $reply->update(request(['body']));
         } catch (\Exception $e) {
             return response('Sorry, your response could not be updated at this time.', 422);
@@ -130,15 +129,5 @@ class ReplyController extends Controller
         }
 
         return back();
-    }
-
-    /**
-     * @throws ValidationException
-     * @throws \Exception
-     */
-    protected function validateReply() {
-        $this->validate(request(), ['body' => 'required']);
-
-        resolve(Spam::class)->detect(request('body'));
     }
 }
