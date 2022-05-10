@@ -4,7 +4,7 @@ namespace App\Inspections;
 
 use Exception;
 
-class Spam
+class Spam implements SpamInterface
 {
     protected $inspections = [
         InvalidKeywords::class,

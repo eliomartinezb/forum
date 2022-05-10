@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Inspections\Spam;
 use App\Reply;
 use App\Thread;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ReplyController extends Controller
 {
@@ -19,7 +24,7 @@ class ReplyController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return LengthAwarePaginator
      */
     public function index($channelId, Thread $thread)
     {
@@ -41,15 +46,13 @@ class ReplyController extends Controller
      *
      * @param $channelId
      * @param Thread $thread
-     * @return \Illuminate\Database\Eloquent\Model
-     * @throws \Illuminate\Validation\ValidationException
+     * @return RedirectResponse
+     * @throws ValidationException
      * @throws \Exception
      */
-    public function store($channelId, Thread $thread): \Illuminate\Database\Eloquent\Model
+    public function store($channelId, Thread $thread): RedirectResponse
     {
-        $this->validate(request(), [
-            'body' => 'required'
-        ]);
+        $this->validateReply();
 
         $reply = $thread->addReply([
             'body' => request('body'),
@@ -66,7 +69,7 @@ class ReplyController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Reply  $reply
+     * @param Reply $reply
      * @return \Illuminate\Http\Response
      */
     public function show(Reply $reply)
@@ -77,7 +80,7 @@ class ReplyController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Reply  $reply
+     * @param Reply $reply
      * @return \Illuminate\Http\Response
      */
     public function edit(Reply $reply)
@@ -89,14 +92,15 @@ class ReplyController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param  \App\Reply  $reply
-     * @return \Illuminate\Http\Response
+     * @param Reply $reply
+     * @return void
+     * @throws ValidationException|AuthorizationException
      */
-    public function update(Request $request, Reply $reply)
+    public function update(Request $request, Reply $reply, Spam $spam)
     {
         $this->authorize('update', $reply);
 
-        $this->validate(request(), ['body' => 'required']);
+        $this->validateReply();
 
         $reply->update(request(['body']));
     }
@@ -104,10 +108,10 @@ class ReplyController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Reply  $reply
-     * @return \Illuminate\Http\Response
+     * @param Reply $reply
+     * @return RedirectResponse
      */
-    public function destroy(Reply $reply)
+    public function destroy(Reply $reply): RedirectResponse
     {
         $this->authorize('update', $reply);
 
@@ -118,5 +122,15 @@ class ReplyController extends Controller
         }
 
         return back();
+    }
+
+    /**
+     * @throws ValidationException
+     * @throws \Exception
+     */
+    protected function validateReply() {
+        $this->validate(request(), ['body' => 'required']);
+
+        resolve(Spam::class)->detect(request('body'));
     }
 }
