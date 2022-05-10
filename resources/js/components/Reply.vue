@@ -19,7 +19,7 @@
             <div class="body" v-else v-text="body"></div>
         </div>
         <!-- @can('update', $reply)
-            
+
         @endcan -->
         <div class="panel-footer level p-2" v-if="userCanUpdate">
             <button class="btn btn-xs mr-1" @click="editing = true">Edit</button>
@@ -40,7 +40,7 @@
                 editing: false,
             };
         },
-        computed: { 
+        computed: {
             ago() {
                 return moment(this.data.owner.created_at).fromNow();
             },
@@ -60,6 +60,8 @@
             update() {
                 axios.patch('/replies/' + this.data.id, {
                     body: this.body,
+                }).catch(error => {
+                    flash(error.response.error, 'danger');
                 });
 
                 this.editing = false;

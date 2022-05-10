@@ -2,9 +2,9 @@
     <div class="mt-4">
        <div v-if="signedIn">
            <div class="form-group" >
-                <textarea name="body" id="body" placeholder="Have something to say?..." class="w-100" v-model="body"></textarea> 
+                <textarea name="body" id="body" placeholder="Have something to say?..." class="w-100" v-model="body"></textarea>
             </div>
-            
+
             <button type="submit" class="btn btn-primary" @click="addReply">Post</button>
        </div>
        <div v-else>
@@ -19,7 +19,7 @@
                 body: '',
             }
         },
-        computed: { 
+        computed: {
             signedIn() {
                 return window.app.signedIn;
             },
@@ -32,6 +32,9 @@
                     this.body = '';
                     flash('Your reply has been posted');
                     this.$emit('created', data);
+                }).catch((error) => {
+                    console.log(error);
+                    flash(error.response.data, 'danger');
                 })
             }
         }
