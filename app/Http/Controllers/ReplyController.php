@@ -2,12 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreatePostRequest;
 use App\Reply;
+use App\Rules\SpamFree;
 use App\Thread;
+use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 class ReplyController extends Controller
@@ -33,7 +41,7 @@ class ReplyController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -45,35 +53,22 @@ class ReplyController extends Controller
      *
      * @param $channelId
      * @param Thread $thread
-     * @return RedirectResponse
-     * @throws ValidationException
-     * @throws \Exception
+     * @return Application|ResponseFactory|RedirectResponse|Response|Model
+     * @throws Exception
      */
-    public function store($channelId, Thread $thread): RedirectResponse
+    public function store(CreatePostRequest $form, $channelId, Thread $thread)
     {
-        try{
-            request()->validate(['body' => 'required|spamFree']);
-
-            $reply = $thread->addReply([
-                'body' => request('body'),
-                'user_id' => auth()->id()
-            ]);
-        }catch (\Exception $e) {
-            return response('Sorry, your response could not be saved at this time.', 422);
-        }
-
-        if (request()->expectsJson()) {
-            return $reply->load('owner');
-        }
-
-        return back()->with('flash', 'Your reply has been left.');
+        return $thread->addReply([
+            'body' => request('body'),
+            'user_id' => auth()->id()
+        ])->load('owner');
     }
 
     /**
      * Display the specified resource.
      *
      * @param Reply $reply
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Reply $reply)
     {
@@ -84,7 +79,7 @@ class ReplyController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param Reply $reply
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Reply $reply)
     {
@@ -104,9 +99,9 @@ class ReplyController extends Controller
         $this->authorize('update', $reply);
 
         try {
-            request()->validate(['body' => 'required|spamFree']);
+            request()->validate(['body' => ['required', new SpamFree]]);
             $reply->update(request(['body']));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response('Sorry, your response could not be updated at this time.', 422);
         }
 

@@ -18,13 +18,13 @@
             }
         },
         created() {
-            axios.get("/profiles/" + window.user.name + "/notifications")
+            axios.get("/profiles/" + window.app.user.name + "/notifications")
                 .then(response => this.notifications = response.data)
 
         },
         methods: {
             markAsRead(notification) {
-                axios.delete("/profiles/" + window.user.name + "/notifications/" + notification.id);
+                axios.delete("/profiles/" + window.app.user.name + "/notifications/" + notification.id);
             }
         }
     }

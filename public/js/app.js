@@ -2340,13 +2340,13 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     var _this = this;
 
-    axios.get("/profiles/" + window.user.name + "/notifications").then(function (response) {
+    axios.get("/profiles/" + window.app.user.name + "/notifications").then(function (response) {
       return _this.notifications = response.data;
     });
   },
   methods: {
     markAsRead: function markAsRead(notification) {
-      axios["delete"]("/profiles/" + window.user.name + "/notifications/" + notification.id);
+      axios["delete"]("/profiles/" + window.app.user.name + "/notifications/" + notification.id);
     }
   }
 });

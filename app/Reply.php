@@ -4,7 +4,9 @@ namespace App;
 
 use App\Traits\Favoritable;
 use App\Traits\RecordsActivity;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Reply
@@ -57,12 +59,12 @@ class Reply extends Model
         });
     }
 
-    public function owner(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function owner(): BelongsTo
     {
         return $this->belongsTo('App\User', 'user_id');
     }
 
-    public function thread(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function thread(): BelongsTo
     {
         return $this->belongsTo('App\Thread');
     }
@@ -70,5 +72,15 @@ class Reply extends Model
     public function path(): string
     {
         return $this->thread->path() . "#reply-{$this->id}";
+    }
+
+    /**
+     * Determine if the reply was just published a moment ago.
+     *
+     * @return bool
+     */
+    public function wasJustPublished()
+    {
+        return $this->created_at->gt(Carbon::now()->subMinute());
     }
 }
