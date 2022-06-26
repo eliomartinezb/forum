@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreatePostRequest;
+use App\Notifications\YouWereMentioned;
 use App\Reply;
 use App\Rules\SpamFree;
 use App\Thread;
+use App\User;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Foundation\Application;
@@ -58,10 +60,25 @@ class ReplyController extends Controller
      */
     public function store(CreatePostRequest $form, $channelId, Thread $thread)
     {
-        return $thread->addReply([
+        $reply = $thread->addReply([
             'body' => request('body'),
             'user_id' => auth()->id()
-        ])->load('owner');
+        ]);
+
+        preg_match_all('/(?<=@)[^\s\.@]+/', $reply->body, $matches);
+        //dd($matches[0]);
+
+        $names = $matches[0];
+
+        foreach ($names as $name) {
+            $user = User::whereName($name)->first();
+
+            if ($user) {
+                $user->notify(new YouWereMentioned($reply));
+            }
+        }
+
+        return $reply->load('owner');
     }
 
     /**
