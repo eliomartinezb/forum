@@ -5,6 +5,7 @@ namespace App;
 use App\Traits\Favoritable;
 use App\Traits\RecordsActivity;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -17,9 +18,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $body
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Activity[] $activity
+ * @property-read Collection|\App\Activity[] $activity
  * @property-read int|null $activity_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Favorite[] $favorites
+ * @property-read Collection|\App\Favorite[] $favorites
  * @property-read int|null $favorites_count
  * @property-read mixed $is_favorited
  * @property-read \App\User $owner
@@ -82,5 +83,11 @@ class Reply extends Model
     public function wasJustPublished()
     {
         return $this->created_at->gt(Carbon::now()->subMinute());
+    }
+
+    public function mentionedUsers() {
+        preg_match_all('/(?<=@)[^\s\.@]+/', $this->body, $matches);
+
+        return $matches[0];
     }
 }
